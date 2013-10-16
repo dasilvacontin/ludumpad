@@ -209,7 +209,7 @@ LudumPad.DefaultConnectionConfig.prototype = {
 	connecting : false,
 	host : 'vgafib.com',
 	port : 4242,
-	idSize : 1,
+	idSize : 4,
 	setOptions : function (options) {
 		if (!options) return;
 		if (options.channelID) this.channelID = options.channelID;
