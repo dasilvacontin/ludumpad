@@ -209,7 +209,7 @@ LudumPad.DefaultConnectionConfig.prototype = {
 	connecting : false,
 	host : 'vgafib.com',
 	port : 4242,
-	idSize : 4,
+	idSize : 1,
 	setOptions : function (options) {
 		if (!options) return;
 		if (options.channelID) this.channelID = options.channelID;
@@ -632,6 +632,7 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 				if (gPacket.s != undefined) gamepad.screen.setSize(gPacket.s);
 				if (gPacket.g != undefined) gamepad.gyroscope = gPacket.g;
 				if (gPacket.p != undefined) gamepad.paused = gPacket.p;
+				if (gPacket.pd != undefined) gamepad.dpad = gPacket.pd;
 				this._onpacketfromgamepad(gPacket, gamepad);
 			}
 		}.bind(this));
@@ -685,6 +686,10 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 	},
 	emitConfigurationToGamepads : function (gamepads, c) {
 		this.emitPacketToGamepads(gamepads, c, LudumPad.MessageTypeGamepadConfiguration);
+	},
+	forEachGamepad : function (f) {
+		var glist = this.gamepadList;
+		for (var i = 0; i < glist.length; ++i) if (glist[i] != undefined) f(glist[i]);
 	},
 	_sendPing : function () {
 		var now = +new Date ();
