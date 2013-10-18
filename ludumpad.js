@@ -207,13 +207,15 @@ LudumPad.DefaultConnectionConfig.prototype = {
 	channelID : undefined,
 	connected : false,
 	connecting : false,
-	host : 'vgafib.com',
+	host : undefined,
+	hostIndex : 0,
+	hostList : ['localhost', 'vgafib.com'],
 	port : 4242,
 	idSize : 4,
 	setOptions : function (options) {
 		if (!options) return;
 		if (options.channelID) this.channelID = options.channelID;
-		if (options.host) this.host = options.host;
+		if (options.host) this.hostList.splice(1, 0, options.host);
 		if (options.port) this.port = options.port;
 	},
 	generateRandomChannelID : function () {
@@ -575,12 +577,15 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 		if (this.connected || this.connecting) return false;
 		this.connecting = true;
 
+		this.host = this.hostList[this.hostIndex];
+
 		this.socket = io.connect('http://'+this.host+':'+this.port);
 
-		this.socket.on('openChannelCallback', function (statusCode) {
+		this.socket.on('openChannelCallback', function (p) { //{statusCode, localIP}
 			this.connected = true;
 			this.connecting = false;
-			switch (statusCode) {
+			if (this.host == "localhost") this.host = p.localIP;
+			switch (p.statusCode) {
 				case LudumPad.StatusCode.OK: LudumPad.log('Opened channel with ID '+this.channelID);
 					new LudumPad.UI.Bubble({msg:'Successfully opened Channel with id '+this.channelID + ' on server '+this.host});
 					this._onopen();
@@ -588,7 +593,7 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 				case LudumPad.StatusCode.ChannelAlreadyExists: alert('Channel already exists.');
 					this.connecting = false;
 					this.connected = false;
-					this._onconnectionerror(statusCode);
+					this._onconnectionerror(p.statusCode);
 					break;
 			}
 		}.bind(this));
@@ -648,6 +653,10 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 				this.connecting = false;
 				this.connected = false;
 				this._onconnectionfailed();
+				if (this.hostIndex+1 < this.hostList.length) {
+					this.hostIndex++;
+					this.open();
+				}
 			}
 		}.bind(this));
 
@@ -791,7 +800,7 @@ LudumPad.UI.Bubble.prototype = {
 	height : 30,
 	margin : 30,
 	cornerRadius : 15,
-	idle: 3,
+	idle: 1,
 	type : 'default',
 	backgroundColor : "white",
 	textColor : "#111111",
