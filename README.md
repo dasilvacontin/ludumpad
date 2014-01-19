@@ -1,4 +1,4 @@
-# ludumpad-client
+# ludumpad-client [![Stories in Ready](https://badge.waffle.io/dasilvacontin/ludumpad-client.png?label=ready)](https://waffle.io/dasilvacontin/ludumpad-client)
 LudumPad is an open-source javascript library for using smartphones as gamepads for your games.
 
 With Lumpad, connecting a smartphone to a game is as easy as reading a QR-Code. It also provides a configurable gamepad client, and basic UI such as connection status bubbles and a pause screen. LudumPad is built on top of [socket.io](https://github.com/learnboost/socket.io), so porting LudumPad is effortless.
