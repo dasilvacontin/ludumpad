@@ -1,3 +1,8 @@
+/*
+  ludumpad-client - v0.0.1 - 2013-10-28
+  Copyright(c) 2013 David da Silva Contín <daviddasilvacontin@me.com> MIT Licensed
+*/
+
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
  
@@ -30,7 +35,10 @@
         };
 }());
 
+
+
 //bind polyfill
+
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (oThis) {
     if (typeof this !== "function") {
@@ -55,7 +63,10 @@ if (!Function.prototype.bind) {
   };
 }
 
+
+
 // greensock polyfill
+
 if (!window.TweenLite) {
 	//Ugly polyfill lulz
 	window.TweenLite = {};
@@ -71,8 +82,11 @@ if (!window.TweenLite) {
 	window.Power4 = {ease:0};
 }
 
+
+
 // From underscore.js
 // Extend a given object with all the properties in passed-in object(s).
+
 var _ = {};
 var slice = Array.prototype.slice;
 var nativeForEach = Array.prototype.forEach;
@@ -102,7 +116,10 @@ _.extend = function(obj) {
 	return obj;
 };
 
+
+
 // http://stackoverflow.com/questions/1255512/how-to-draw-a-rounded-rectangle-on-html-canvas
+
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;
   if (h < 2 * r) r = h / 2;
@@ -116,29 +133,18 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   return this;
 }
 
-http://stackoverflow.com/questions/10001726/access-get-variables-using-jquery-javascript
+
+
+// http://stackoverflow.com/questions/10001726/access-get-variables-using-jquery-javascript
+
 function getParameterByName (name) {
 	var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
 	return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-}
-
-
-
-
-
-/*
-
-	LudumPad.js build:0.1, development. Copyright(c) 2013 David da Silva Contín <daviddasilvacontin@me.com> MIT Licensed
-
-*/
-
-
-
-
-var LudumPad = {
+};var LudumPad = {
 	debug : false,
 	_oldDate : +new Date (),
-	_delta : 0
+	_delta : 0,
+	version: 0.1 //Used to check compatibility between versions
 };
 LudumPad.Colors = ["#fe0e63"]; //Just an array of colors I personally like
 
@@ -146,13 +152,18 @@ LudumPad.Colors = ["#fe0e63"]; //Just an array of colors I personally like
 LudumPad.MessageTypePacket = -1;
 LudumPad.MessageTypeGamepadConfiguration = 0;
 LudumPad.MessageTypePingResponse = 1;
+LudumPad.MessageTypeGamepadSyncType = 2;
 
-//Gamepad Input types
-LudumPad.GamepadInputTypeTouches = 0;
-LudumPad.GamepadInputTypeDPAD = 1;
-LudumPad.GamepadInputTypeJoystick = 2; // Yet to be implemented
-LudumPad.GamepadInputTypeButtons = 3;
-LudumPad.GamepadMotionGyroscope = 10;
+//Gamepad Types (Gamepad can be 2 types at most)
+LudumPad.GamepadTypeDPAD = 0;
+LudumPad.GamepadTypeJoystick = 1;
+LudumPad.GamepadTypeButtons = 2;
+
+//Input Configuration (additional input data)
+LudumPad.GamepadConfInputTouches = 0;
+LudumPad.GamepadConfInputGyroscope = 1;
+LudumPad.GamepadConfInputAccelerometer = 2;
+LudumPad.GamepadConfInputPointer = 3;
 
 LudumPad._logic = function () {
 
@@ -209,7 +220,7 @@ LudumPad.DefaultConnectionConfig.prototype = {
 	connecting : false,
 	host : undefined,
 	hostIndex : 0,
-	hostList : ['localhost', 'vgafib.com'],
+	hostList : ['localhost', 'kipos.me'],
 	port : 4242,
 	idSize : 4,
 	setOptions : function (options) {
@@ -230,14 +241,7 @@ LudumPad.DefaultConnectionConfig.prototype = {
 	    	return (Math.random()*16|0).toString(16);
 		});
 	}
-}
-
-
-
-
-/* LudumPad.Screen */
-
-LudumPad.Screen = function () {}
+};LudumPad.Screen = function () {}
 LudumPad.Screen.prototype = _.extend(new LudumPad.ObjectWithEvents (), {
 	width: window.innerWidth,
 	height: window.innerHeight,
@@ -260,10 +264,92 @@ LudumPad.Screen.prototype.setSize = function (size) {
 LudumPad.Screen.prototype.packet = function () {
 	return {width:this.width, height:this.height};
 }
-LudumPad.LocalScreen = (new LudumPad.Screen ()).isLocal();
+LudumPad.LocalScreen = (new LudumPad.Screen ()).isLocal();;LudumPad.GamepadButton = function (text, bgcolor) {
+	this.text = text;
+	this.bgcolor = bgcolor;
+}
 
+LudumPad.GamepadType = function (type) {
+	this.type = type;
+}
+LudumPad.GamepadType.prototype = {
+	addButtonToRow : function (button, row) {
+		if (this.buttons == undefined) this.buttons = [];
+		while (row > this.buttons.length-1) this.buttons.push([]);
+		this.buttons[row].push(button);
+	}
+}
+LudumPad.GamepadType.prototype.checkUpdate = function () {
+	switch (this.type) {
 
+		case LudumPad.GamepadTypeDPAD:  //DPAD
+			if (this._old == undefined) this._old = -1;
+			if (this.dpad == undefined) this.dpad = -1;
+			if (this._old != this.dpad) {
+				this._old = this.dpad;
+				return this.dpad;
+			} else {
+				this._old = this.dpad;
+				return undefined;
+			}
 
+		case LudumPad.GamepadTypeButtons: //Buttons
+			var currSnapshot = this.buttonsSnapshot();
+			if (this._old == undefined) this._old = currSnapshot;
+
+			var isEqual = this.equalSnapshots(currSnapshot, this._old)
+			this._old = currSnapshot;
+			if (isEqual) return currSnapshot;
+			else return undefined;
+
+		default: return undefined;
+
+	}
+}
+LudumPad.GamepadType.prototype.buttonsSnapshot = function () {
+	if (this.buttons == undefined) this.buttons = [];
+	var snap = [];
+	for (var i = 0; i < this.buttons.length; ++i) {
+		var brow = this.buttons[i];
+		var row = [];
+		for (var j = 0; j < brow.length; ++j) {
+			row.push((brow[j].state == true));
+		}
+		snap.push(row);
+	}
+	return snap;
+}
+LudumPad.GamepadType.prototype.equalSnapshots = function (snap1, snap2) {
+	if (snap1.length != snap2.length) return false;
+	for (var i = 0; i < snap1.length; ++i) {
+		if (snap1[i].length != snap2[i].length) return false;
+		for (var j = 0; j < snap1[i].length; ++j) {
+			if (snap1[i][j] != snap2[i][j]) return false;
+		}
+	}
+	return true;
+}
+LudumPad.GamepadType.prototype.update = function (u) {
+	if (u == undefined) return;
+	switch (this.type) {
+
+		case LudumPad.GamepadTypeDPAD: this._old = this.dpad;
+		this.dpad = u;
+		break;
+
+		case LudumPad.GamepadTypeButtons: //Buttons
+			for (var i = 0; i < this.buttons.length; ++i) {
+				var row = this.buttons[i];
+				for (var j = 0; j < row.length; ++j) {
+					var button = this.buttons[i][j];
+					button._old = button.state;
+					button.state = u[i][j];
+				}
+			}
+		break;
+
+	}
+}
 
 
 /* LudumPad.Gamepad */
@@ -271,6 +357,8 @@ LudumPad.LocalScreen = (new LudumPad.Screen ()).isLocal();
 LudumPad.Gamepad = function () {
 	this.touches = [];
 	this.screen = new LudumPad.Screen ();
+	this.types = [];
+	this.conf = {};
 }
 LudumPad.Gamepad.prototype = {
 
@@ -283,7 +371,12 @@ LudumPad.Gamepad.prototype = {
 	gyroscope : {LR:0, FB:0, dir:0},
 	dpad : -1,
 	bgcolor : "#111111",
-	ping : 0
+	ping : 0,
+	_needsTypeSync : false,
+	setTypes : function (types) {
+		this.types = types;
+		this._needsTypeSync = true;
+	}
 	
 };
 LudumPad.Gamepad.dir = {
@@ -294,33 +387,29 @@ LudumPad.Gamepad.dir = {
 	NONE : -1
 }
 LudumPad.Gamepad.dirPoints = [{x:0.5,y:0},{x:1,y:0.5},{x:0.5,y:1},{x:0,y:0.5}];
-LudumPad.Gamepad._instances = [];
-
-
-
-/* LudumPad.GamepadClient */
-
-LudumPad.GamepadClient = function (options) {
+LudumPad.Gamepad._instances = [];;LudumPad.GamepadClient = function (options) {
 	this.setOptions(options);
 	LudumPad.Gamepad._instances.push(this);
 	this.touches = [];
+	this.types = [];
+	this.conf = {};
 
-	document.body.addEventListener('touchmove', function(event) {
+	document.body.addEventListener('touchmove', function (event) {
 		event.preventDefault();
 	}, false);
 
-	LudumPad.UI.canvas.addEventListener('touchstart', function(event) {
+	LudumPad.UI.canvas.addEventListener('touchstart', function (event) {
 		this.touches = event.touches;
 		this._touched = true;
 		this._force = true;
 	}.bind(this), false);
 
-	document.body.addEventListener('touchmove', function(event) {
+	document.body.addEventListener('touchmove', function (event) {
 		this.touches = event.touches;
 		this._touched = true;
 	}.bind(this), false);
 
-	LudumPad.UI.canvas.addEventListener('touchend', function(event) {
+	LudumPad.UI.canvas.addEventListener('touchend', function 	(event) {
 		this.touches = event.touches;
 		this._touched = true;
 		this._force = true;
@@ -354,6 +443,8 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 	_onconnect: dummyf,
 	_onconnectionerror : dummyf,
 	_onchannelpacket : dummyf,
+	_onconfiguration : dummyf,
+	_ontypesync : dummyf,
 	_onconnectionfailed : dummyf,
 	_onconnectionclosed : dummyf,
 	_onchanneldied : dummyf,
@@ -364,6 +455,10 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 
 		if (this.connected || this.connecting) return false;
 		this.connecting = true;
+
+		this.host = this.hostList[0];
+		console.log('host is '+this.host);
+
 		this.socket = io.connect('http://'+this.host+':'+this.port);
 
 		this.socket.on('connectToChannelCallback', function (statusCode) {
@@ -387,12 +482,14 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 		}.bind(this));
 
 		this.socket.on('connect', function () {
+			LudumPad.log('Connection. Requesting...');
 			this._lastPingRequest = +new Date ();
 			this.socket.emit('connectToChannel', {channel:this.channelID, g:{alias:this.alias, screen:this.screen.packet()}});
 		}.bind(this));
 
 		this.socket.on('channelPacket', function (data) {
 			switch (data.t) {
+
 				case LudumPad.MessageTypeGamepadConfiguration: LudumPad.log('Got conf packet from channel!');
 					console.log(data);
 					if (data.p) {
@@ -405,11 +502,32 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 								this.conf[conf[i]] = true;
 							}
 						}
+						if (data.p.type) this.type = data.p.type;
+						this._onconfiguration(data.p);
 					}
 				break;
+
 				case LudumPad.MessageTypePingResponse: this.ping = Math.floor( this.ping/3 + ( ((+new Date ()) - this._lastPingRequest)/2 )*2/3 );
 				break;
+
 				case LudumPad.MessageTypePacket: this._onchannelpacket(data.p);
+				break;
+
+				case LudumPad.MessageTypeGamepadSyncType: LudumPad.log("Got Sync Type Message from Channel");
+					console.log(data);
+					//this.types = data.p;
+					this.types = [];
+					for (var i = 0; i < data.p.length; ++i) {
+						var ptype = data.p[i];
+						var type = new LudumPad.GamepadType ();
+						for (var prop in ptype) {
+							type[prop] = ptype[prop];
+						}
+						this.types.push(type);
+					}
+					this._ontypesync();
+				break;
+
 			}
 		}.bind(this));
 
@@ -459,55 +577,64 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 		if (!this.connected) return;
 		var g = this.gyroscope;
 
+		var needsUpdate = false;
+		var timeUpdate = (newDate - this._lastPacket) > this._msSkip;
+
 		var p = {};
 
 		/* Screen changed? */
-		var updateScreen = this._screenChanged;
-		if (updateScreen) {
+		if (this._screenChanged) {
+			needsUpdate = true;
 			this._screenChanged = false;
 			p.s = this.screen.packet();
 		}
 
-		var updatePaused = false;
-		var updateDPAD = false;
-		var updateTouches = false;
-		var updateGyroscope = false;
-
 		/* Pause changed? */
 		var wasPaused = this.paused;
 		this.paused = ((g.LR > 150 || g.LR < -150) && (g.FB < 25 && g.FB > -25));
-		var updatePaused = (wasPaused != this.paused);
-		if (updatePaused) {
+		if (wasPaused != this.paused) {
+			needsUpdate = true;
 			p.p = this.paused;
 		}
 
 		if (!this.paused) {
 
-			/* Check if should update DPAD */
-			if (this.conf[LudumPad.GamepadInputTypeDPAD] && this._touched) {
-				this._olddpad = this.dpad;
-				this.dpad = this._updatedpad();
-				updateDPAD = (this.dpad != this._olddpad);
-				if (updateDPAD) {
-					p.pd = this.dpad;
+			/* Check which pieces should update */
+			for (var i = 0; i < this.types.length; ++i) {
+				var update = this.types[i].checkUpdate();
+				if (update != undefined) {
+					needsUpdate = true;
+					if (p.u == undefined) p.u = [];
+					p.u[i] = update;
 				}
 			}
 
+			/* Check if should update DPAD
+			if (this.conf[LudumPad.GamepadTypeDPAD] && this._touched) {
+				this._olddpad = this.dpad;
+				this.dpad = this._updatedpad();
+				if (this.dpad != this._olddpad) {
+					p.pd = this.dpad;
+					needsUpdate = true;
+				}
+			}
+			*/
+
 			/* Check if should update touches */
-			if (this.conf[LudumPad.GamepadInputTypeTouches]) {
-				updateTouches = this._force || (this._touched && (newDate - this._lastPacket) > this._msSkip);
+			if (this.conf[LudumPad.GamepadConfInputTouches] && (this._force || (this._touched && timeUpdate)) ) {
+				needsUpdate = true;
 			}
 			
 			/* Check if should update gyroscope */
-			if (this.conf[LudumPad.GamepadMotionGyroscope]) {
-				updateGyroscope = ((newDate - this._lastPacket) > this._msSkip);
+			if (this.conf[LudumPad.GamepadConfInputGyroscope] && timeUpdate) {
+				needsUpdate = true;
 			}
 
 		}
 
-		if (updateTouches || updateDPAD || updatePaused || updateScreen) {
-			if (this.conf[LudumPad.GamepadInputTypeTouches]) p.t = this._touchesPacket();
-			if (this.conf[LudumPad.GamepadMotionGyroscope]) p.g = this.gyroscope;
+		if (needsUpdate) {
+			if (this.conf[LudumPad.GamepadConfInputTouches]) p.t = this._touchesPacket();
+			if (this.conf[LudumPad.GamepadConfInputGyroscope]) p.g = this.gyroscope;
 			this._lastPacket = newDate;
 			this._force = false;
 			this._touched = false;
@@ -536,16 +663,16 @@ LudumPad.GamepadClient.prototype = _.extend(LudumPad.GamepadClient.prototype, {
 	_pingRequest : function () {
 		this._lastPingRequest = +new Date ();
 		this.emitPacket({ping:1});
+	},
+	//Forces hostList to only be the provided host, if any
+	setOptions : function (options) {
+		if (!options) return;
+		if (options.channelID) this.channelID = options.channelID;
+		if (options.host) this.hostList = [options.host];
+		if (options.port) this.port = options.port;
 	}
 
-});
-
-
-
-
-/* LudumPad.Channel */
-
-LudumPad.Channel = function (options) {
+});;LudumPad.Channel = function (options) {
 	this.setOptions(options);
 	if (this.channelID == undefined) this.generateRandomChannelID();
 	this.gamepadList = [];
@@ -637,7 +764,9 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 				if (gPacket.s != undefined) gamepad.screen.setSize(gPacket.s);
 				if (gPacket.g != undefined) gamepad.gyroscope = gPacket.g;
 				if (gPacket.p != undefined) gamepad.paused = gPacket.p;
-				if (gPacket.pd != undefined) gamepad.dpad = gPacket.pd;
+				if (gPacket.u != undefined) {
+					for (var i = 0; i < gPacket.u.length; ++i) gamepad.types[i].update(gPacket.u[i]);
+				}
 				this._onpacketfromgamepad(gPacket, gamepad);
 			}
 		}.bind(this));
@@ -712,19 +841,23 @@ LudumPad.Channel.prototype = _.extend(LudumPad.Channel.prototype, {
 		return undefined;
 	},
 	_logic : function () {
+
 		var pausedNow = (this._getFirstPausedGamepad() != undefined);
 		if (!this.paused && pausedNow) new LudumPad.UI.PauseCover(this);
 		this.paused = pausedNow;
+
+		for (var i = 0; i < this.gamepadList.length; ++i) {
+			var gamepad = this.gamepadList[i];
+			if (gamepad._needsTypeSync) {
+				gamepad._needsTypeSync = false;
+				this.emitPacketToGamepads([gamepad], gamepad.types, LudumPad.MessageTypeGamepadSyncType);
+				LudumPad.log("Syncing Type with gamepad "+gamepad.id);
+			}
+		}
+
 	}
 });
-LudumPad.Channel._instances = [];
-
-
-
-
-/* LudumPad.UI */
-
-LudumPad.UI = {};
+LudumPad.Channel._instances = [];;LudumPad.UI = {};
 LudumPad.UI.configure = function (props) {
 	if (props.canvas) this.canvas = props.canvas;
 	if (props.ctx) this.ctx = props.ctx;

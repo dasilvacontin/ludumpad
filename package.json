@@ -1,0 +1,24 @@
+{
+  "name": "ludumpad-client",
+  "version": "0.0.1",
+  "description": "LudumPad is an open-source javascript library for using smartphones as gamepads for your games.",
+  "main": "dist/ludumpad.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AirRider3/ludumpad-client.git"
+  },
+  "author": "David da Silva Contín",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AirRider3/ludumpad-client/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-concat": "~0.3.0"
+  }
+}
