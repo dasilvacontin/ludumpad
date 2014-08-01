@@ -10,20 +10,7 @@ app.on('session_created', function(server)
 app.on('disconnect', function(server)
 {
 
-});
-
-var configA = new LUDUMPAD.ButtonConfig();
-configA.setLabel('A');
-configA.setFontColor('white');
-configA.setColor('red');
-
-var configB = new LUDUMPAD.ButtonConfig();
-configA.setLabel('B');
-configA.setFontColor('white');
-configA.setColor('green');
-
-var configDPAD = new LUDUMPAD.DPADConfig();
-configDPAD.setColor('blue');
+});-
 
 var callbackA = function(evt)
 {
@@ -32,14 +19,11 @@ var callbackA = function(evt)
 
 app.on('controller_joined', function(controller)
 {
-	controller.addComponent('buttonA', new LUDUMPAD.Button(configA));
-	controller.addComponent('buttonB', new LUDUMPAD.Button(configB));
-	controller.addComponent('dpad', new LUDUMPAD.DPAD(configDPAD));
+	controller.setLayout(LUDUMPAD.CLASSIC_LAYOUT);
 
 	controller.enable([
 		LUDUMPAD.ACCELEROMETER,
-		LUDUMPAD.GYROSCOPE,
-		LUDUMPAD.TOUCHES
+		LUDUMPAD.GYROSCOPE
 	]);.
 
 	app.sendConfiguration(controller);
