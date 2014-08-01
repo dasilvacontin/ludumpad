@@ -2,12 +2,12 @@
 var server = new LUDUMPAD.ServerDetails("http://dasilvacont.in", 4242);
 var app = new LUDUMPAD.App(server);
 
-app.on('session_started', function(server)
+app.on('session_created', function(server)
 {
 
 });
 
-app.on('disconnected', function(server)
+app.on('disconnect', function(server)
 {
 
 });

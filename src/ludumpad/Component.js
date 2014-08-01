@@ -90,6 +90,7 @@ LUDUMPAD.Component.prototype.setId = function(id)
 
 /**
  * Sets the Component's owner (Controller). Meant to be called by the Controller to which the Component is added.
+ * Owner property used 
  *
  * @method setOwner
  */

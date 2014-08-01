@@ -56,7 +56,7 @@ var EVT_CONNECTION_FAILED = 'connection_failed';
  *
  * @event disconnected
  */
-var EVT_CONNECTION_FAILED = 'disconnected';
+var EVT_DISCONNECT = 'disconnect';
 
 /**
  * Fired when a Controller joins the App's Session
@@ -68,9 +68,9 @@ var EVT_CONTROLLER_JOINED = 'controller_joined';
 /**
  * Fired when a Controller disconnects from the App's Session
  *
- * @event controller_disconnected
+ * @event controller_disconnect
  */
-var EVT_CONTROLLER_DISCONNECTED = 'controller_disconnected';
+var EVT_CONTROLLER_DISCONNECT = 'controller_disconnect';
  
 /**
  * Creates a session on the given server or the first server available from the given array
