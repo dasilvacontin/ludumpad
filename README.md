@@ -1,5 +1,7 @@
 # ludumpad-client
 
+![fake stock img](https://github.com/dasilvacontin/ludumpad-client/raw/master/stock.jpg)
+
 Use mobile devices as game controllers with just a few lines of code.
 
 I'm currently working from scratch on a new prototype, with new features.
