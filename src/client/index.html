@@ -43,6 +43,7 @@
       z-index: 1;
     }
   </style>
+  <script src="http://192.168.0.100:3000/socket.io/socket.io.js"></script>
 </head>
 <body>
   <img id="mock bg" src="assets/images/iPhone-6-idle@2x.png" width="667" height="375">
@@ -53,13 +54,15 @@
   <div id="cover"></div>
 
   <script>
+    var socket = io('http://192.168.0.100:3000/')
+
     var dirPad = document.getElementById('dir-pad')
     var joystickBg = document.getElementById('joystick-bg')
 
     function preventDefault (e) { e.preventDefault() }
 
-    var joystickX = 0
-    var joystickY = 0
+    var oldData = null
+    var joystickData = [0, 0] // x and y axis
     var jcenter = { x: 76 + 181/2, y: 97 + 181/2 }
     var joystickTouchId = null
 
@@ -90,17 +93,51 @@
     function handleJoystickMove (e) {
       var touch = getJoystickTouch(e)
       if (!touch) return
+
       var dx = touch.pageX - jcenter.x
       var dy = touch.pageY - jcenter.y
       var theta =  Math.atan2(dy, dx)
       theta *= 180 / Math.PI
       if (theta < 0) theta += 360
-      if (theta > 360) theta -= 360
       var exceed = theta % 45
       var angle = exceed < 22.5
         ? theta - exceed
         : theta + 45 - exceed
-      console.log(angle, theta)
+      if (angle === 360) angle = 0
+
+      switch (angle) {
+        case 0:
+          joystickData = [1, 0]
+          break
+
+        case 45:
+          joystickData = [1, -1]
+          break
+
+        case 90:
+          joystickData = [0, -1]
+          break
+
+        case 135:
+          joystickData = [-1, -1]
+          break
+
+        case 180:
+          joystickData = [-1, 0]
+          break
+
+        case 225:
+          joystickData = [-1, 1]
+          break
+
+        case 270:
+          joystickData = [0, 1]
+          break
+
+        case 315:
+          joystickData = [1, 1]
+          break
+      }
       dirPad.style.transform = 'rotate(' + (angle + 180) + 'deg)'
     }
 
@@ -108,22 +145,62 @@
       var touch = getJoystickTouch(e)
       if (!touch) return
       joystickTouchId = null
+      joystickData = [0, 0]
       dirPad.style.opacity = joystickBg.style.opacity = 0
+    }
+
+    var buttonTouchId = null
+    var buttonData = [0]
+
+    function getButtonTouch (e) {
+      var touches = tlToArray(e.changedTouches)
+      if (buttonTouchId === null) {
+        return touches.find(function (touch) { return touch.pageX >= 334 })
+      }
+      return touches.find(function (touch) {
+        return touch.identifier === buttonTouchId
+      })
+    }
+
+    function handleButtonStart (e) {
+      var touch = getButtonTouch(e)
+      if (!touch) return
+      buttonTouchId = touch.identifier
+      buttonData = [1]
+    }
+
+    function handleButtonEnd (e) {
+      var touch = getButtonTouch(e)
+      if (!touch) return
+      buttonTouchId = null
+      buttonData = [0]
     }
 
     function touchStart (e) {
       e.preventDefault()
       handleJoystickStart(e)
+      handleButtonStart(e)
+      sendData()
     }
 
     function touchMove (e) {
       e.preventDefault()
       handleJoystickMove(e)
+      sendData()
     }
 
     function touchEnd (e) {
       e.preventDefault()
       handleJoystickEnd(e)
+      handleButtonEnd(e)
+      sendData()
+    }
+
+    function sendData () {
+      var currentData = joystickData.concat(buttonData).join(',')
+      if (oldData === currentData) return
+      oldData = currentData
+      socket.emit('update', currentData)
     }
 
     window.addEventListener('touchstart', touchStart)

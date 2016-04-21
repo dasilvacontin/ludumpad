@@ -16,7 +16,10 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.3.5",
-    "lodash": "^4.11.1"
+    "express": "^4.13.4",
+    "lodash": "^4.11.1",
+    "robotjs": "^0.4.1",
+    "socket.io": "^1.4.5"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",
