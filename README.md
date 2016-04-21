@@ -1,13 +1,11 @@
-# ludumpad-client
+# LudumPad
 
-![fake stock img](https://github.com/dasilvacontin/ludumpad-client/raw/master/stock.jpg)
+![fake stock img](stock.jpg)
 
-Use mobile devices as game controllers with just a few lines of code.
+Use mobile devices as smart game controllers.
 
-I'm currently working from scratch on a new prototype, with new features.
+Work in progress.
 
-This repository currently contains the code of the first prototype; old ugly code. If you want to get a small idea of what it used to be, check the following links:
+## License
 
-[Vine 1](https://vine.co/v/h3AjZEMlzuO)
-
-[Vine 2](https://vine.co/v/h3AI5dTJbZh)
+MIT © [David da Silva]
