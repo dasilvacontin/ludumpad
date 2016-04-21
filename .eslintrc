@@ -1,0 +1,12 @@
+{
+  "parser": "babel-eslint",
+  "plugins": [
+    "flow-vars"
+  ],
+  "extends": ["standard"],
+  "rules": {
+	"arrow-parens": [2, "as-needed"],
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1
+  }
+}
