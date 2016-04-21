@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>LudumPad</title>
+  <meta name="description" content="Use mobile devices as smart game controllers.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #joystick-bg {
+      position: absolute;
+      left: 76px;
+      top: 97px;
+
+      transition: opacity 0.25s;
+      opacity: 0;
+    }
+
+    #dir-pad {
+      position: absolute;
+      left: 76px;
+      top: 122.5px;
+      transform-origin: right center;
+      opacity: 0;
+    }
+
+    #cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <img id="mock bg" src="assets/images/iPhone-6-idle@2x.png" width="667" height="375">
+
+  <img id="joystick-bg" src="assets/images/joystick-background@2x.png" width="181" height="181">
+  <img id="dir-pad" src="assets/images/dir-pad@2x.png" width="91" height="128">
+
+  <div id="cover"></div>
+
+  <script>
+    var dirPad = document.getElementById('dir-pad')
+    var joystickBg = document.getElementById('joystick-bg')
+
+    function preventDefault (e) { e.preventDefault() }
+
+    var joystickX = 0
+    var joystickY = 0
+    var jcenter = { x: 76 + 181/2, y: 97 + 181/2 }
+    var joystickTouchId = null
+
+    function tlToArray (list) {
+      var array = new Array()
+      for (var i = 0; i < list.length; ++i) array.push(list[i])
+      return array
+    }
+
+    function getJoystickTouch (e) {
+      var touches = tlToArray(e.changedTouches)
+      if (joystickTouchId === null) {
+        return touches.find(function (touch) { return touch.pageX < 334 })
+      }
+      return touches.find(function (touch) {
+        return touch.identifier === joystickTouchId
+      })
+    }
+
+    function handleJoystickStart (e) {
+      var touch = getJoystickTouch(e)
+      if (!touch) return
+      joystickTouchId = touch.identifier
+      dirPad.style.opacity = joystickBg.style.opacity = 1
+      handleJoystickMove(e)
+    }
+
+    function handleJoystickMove (e) {
+      var touch = getJoystickTouch(e)
+      if (!touch) return
+      var dx = touch.pageX - jcenter.x
+      var dy = touch.pageY - jcenter.y
+      var theta =  Math.atan2(dy, dx)
+      theta *= 180 / Math.PI
+      if (theta < 0) theta += 360
+      if (theta > 360) theta -= 360
+      var exceed = theta % 45
+      var angle = exceed < 22.5
+        ? theta - exceed
+        : theta + 45 - exceed
+      console.log(angle, theta)
+      dirPad.style.transform = 'rotate(' + (angle + 180) + 'deg)'
+    }
+
+    function handleJoystickEnd (e) {
+      var touch = getJoystickTouch(e)
+      if (!touch) return
+      joystickTouchId = null
+      dirPad.style.opacity = joystickBg.style.opacity = 0
+    }
+
+    function touchStart (e) {
+      e.preventDefault()
+      handleJoystickStart(e)
+    }
+
+    function touchMove (e) {
+      e.preventDefault()
+      handleJoystickMove(e)
+    }
+
+    function touchEnd (e) {
+      e.preventDefault()
+      handleJoystickEnd(e)
+    }
+
+    window.addEventListener('touchstart', touchStart)
+    window.addEventListener('mousedown', touchStart)
+    window.addEventListener('touchmove', touchMove)
+    window.addEventListener('touchend', touchEnd)
+    window.addEventListener('mouseup', touchEnd)
+  </script>
+</body>
+</html>
