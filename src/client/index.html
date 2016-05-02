@@ -17,6 +17,12 @@
       overflow: hidden;
     }
 
+    body {
+      opacity: 0;
+      background: black;
+      transition: opacity 0.5s;
+    }
+
     #joystick-bg {
       position: absolute;
       left: 76px;
@@ -34,6 +40,13 @@
       opacity: 0;
     }
 
+    #b-pressed {
+      position: absolute;
+      top: 207px;
+      left: 397px;
+      opacity: 0;
+    }
+
     #cover {
       position: absolute;
       top: 0;
@@ -43,21 +56,57 @@
       z-index: 1;
     }
   </style>
-  <script src="http://192.168.0.100:3000/socket.io/socket.io.js"></script>
+  <script src="http://192.168.0.108:3000/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
 </head>
 <body>
   <img id="mock bg" src="assets/images/iPhone-6-idle@2x.png" width="667" height="375">
 
   <img id="joystick-bg" src="assets/images/joystick-background@2x.png" width="181" height="181">
   <img id="dir-pad" src="assets/images/dir-pad@2x.png" width="91" height="128">
-
+  <img id="b-pressed" src="assets/images/B-pressed@2x.png" width="101" height="101">
   <div id="cover"></div>
 
   <script>
-    var socket = io('http://192.168.0.100:3000/')
+    var startupSound = new Howl({
+      urls: ['assets/sounds/startup.wav'],
+      onplay: function () {
+        document.body.style.opacity = 1
+      }
+    })
+
+    var inputStartSound = new Howl({
+      urls: ['assets/sounds/inputStart.wav'],
+      volume: 0.1
+    })
+
+    var inputEndSound = new Howl({
+      urls: ['assets/sounds/inputEnd.wav'],
+      volume: 0.02
+    })
+
+    function startup () {
+      startupSound.play()
+      window.removeEventListener('mouseup', startup)
+      window.removeEventListener('touchend', startup)
+
+      window.addEventListener('touchstart', touchStart)
+      window.addEventListener('mousedown', touchStart)
+      window.addEventListener('touchmove', touchMove)
+      window.addEventListener('touchend', touchEnd)
+      window.addEventListener('mouseup', touchEnd)
+    }
+
+    // iOS doesn't play sounds until the first touchend event
+    window.addEventListener('mouseup', startup)
+    window.addEventListener('touchend', startup)
+
+    var socket = io('http://192.168.0.108:3000')
 
     var dirPad = document.getElementById('dir-pad')
     var joystickBg = document.getElementById('joystick-bg')
+    var bPressed = document.getElementById('b-pressed')
+    var inputTimeout = 1000
 
     function preventDefault (e) { e.preventDefault() }
 
@@ -65,6 +114,7 @@
     var joystickData = [0, 0] // x and y axis
     var jcenter = { x: 76 + 181/2, y: 97 + 181/2 }
     var joystickTouchId = null
+    var lastJoystickEvent = Date.now()
 
     function tlToArray (list) {
       var array = new Array()
@@ -73,6 +123,10 @@
     }
 
     function getJoystickTouch (e) {
+      var now = Date.now()
+      var delta = now - lastJoystickEvent
+      if (delta > inputTimeout) joystickTouchId = null
+      lastJoystickEvent = now
       var touches = tlToArray(e.changedTouches)
       if (joystickTouchId === null) {
         return touches.find(function (touch) { return touch.pageX < 334 })
@@ -88,6 +142,7 @@
       joystickTouchId = touch.identifier
       dirPad.style.opacity = joystickBg.style.opacity = 1
       handleJoystickMove(e)
+      inputStartSound.play()
     }
 
     function handleJoystickMove (e) {
@@ -147,12 +202,18 @@
       joystickTouchId = null
       joystickData = [0, 0]
       dirPad.style.opacity = joystickBg.style.opacity = 0
+      inputEndSound.play()
     }
 
     var buttonTouchId = null
+    var lastButtonEvent = Date.now()
     var buttonData = [0]
 
     function getButtonTouch (e) {
+      var now = Date.now()
+      var delta = now - lastButtonEvent
+      if (delta > inputTimeout) buttonTouchId = null
+      lastButtonEvent = now
       var touches = tlToArray(e.changedTouches)
       if (buttonTouchId === null) {
         return touches.find(function (touch) { return touch.pageX >= 334 })
@@ -167,6 +228,8 @@
       if (!touch) return
       buttonTouchId = touch.identifier
       buttonData = [1]
+      bPressed.style.opacity = 1
+      inputStartSound.play()
     }
 
     function handleButtonEnd (e) {
@@ -174,6 +237,8 @@
       if (!touch) return
       buttonTouchId = null
       buttonData = [0]
+      bPressed.style.opacity = 0
+      inputEndSound.play()
     }
 
     function touchStart (e) {
@@ -202,12 +267,6 @@
       oldData = currentData
       socket.emit('update', currentData)
     }
-
-    window.addEventListener('touchstart', touchStart)
-    window.addEventListener('mousedown', touchStart)
-    window.addEventListener('touchmove', touchMove)
-    window.addEventListener('touchend', touchEnd)
-    window.addEventListener('mouseup', touchEnd)
   </script>
 </body>
 </html>

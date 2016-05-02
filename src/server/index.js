@@ -5,15 +5,15 @@ var robot = require('robotjs')
 
 var mappings = [
   {
-    '-1': 'a', // left
-    '1': 'd' // right
+    '-1': 'left', // left
+    '1': 'right' // right
   },
   {
-    '-1': 's', // down
-    '1': 'w' // up
+    '-1': 'down', // down
+    '1': 'up' // up
   },
   {
-    '1': '/' // button
+    '1': 'z' // button
   }
 ]
 
