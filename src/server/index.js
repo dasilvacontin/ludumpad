@@ -14,21 +14,43 @@ app.use(morgan('combined'))
 app.use(express.static(__dirname + '/public'))
 
 var mappings = [
-  {
-    '-1': 'left', // left
-    '1': 'right' // right
-  },
-  {
-    '-1': 'down', // down
-    '1': 'up' // up
-  },
-  {
-    '1': 'z' // button
-  }
+  [ // player 1
+    {
+      '-1': 'left', // left
+      '1': 'right' // right
+    },
+    {
+      '-1': 'down', // down
+      '1': 'up' // up
+    },
+    {
+      '1': 'x' // button
+    }
+  ],
+  [ // player 2
+    {
+      '-1': 'a', // left
+      '1': 'd' // right
+    },
+    {
+      '-1': 's', // down
+      '1': 'w' // up
+    },
+    {
+      '1': 'space' // button
+    }
+  ]
 ]
 
+var players = []
+
 io.on('connection', function (socket) {
-  console.log('a user connected')
+  var freeSlot = players.indexOf(null)
+  if (freeSlot === -1) freeSlot = players.length
+  players[freeSlot] = socket.id
+  var player = freeSlot
+  var mapping = mappings[player]
+  console.log(socket.id + ' connected as player #' + (player + 1))
 
   var oldData = [null, null]
   socket.on('update', function (data) {
@@ -36,12 +58,17 @@ io.on('connection', function (socket) {
     data.forEach(function (val, i) {
       if (oldData[i] === val) return
       var oldVal = oldData[i]
-      var oldKey = mappings[i][oldVal]
+      var oldKey = mapping[i][oldVal]
       if (oldKey) robot.keyToggle(oldKey, 'up')
-      var newKey = mappings[i][val]
+      var newKey = mapping[i][val]
       if (newKey) robot.keyToggle(newKey, 'down')
     })
     oldData = data
+  })
+
+  socket.on('disconnect', function () {
+    console.log(socket.id + '(player #' + (player + 1) + ') disconnected')
+    players[player] = null
   })
 })
 

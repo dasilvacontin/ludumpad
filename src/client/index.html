@@ -6,6 +6,7 @@
   <title>LudumPad</title>
   <meta name="description" content="Use mobile devices as smart game controllers.">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="mobile-web-app-capable" content="yes">
   <link rel="stylesheet" type="text/css" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
@@ -36,23 +37,58 @@
       volume: 0.02
     })
 
+    var socket = null
+
+    // https://github.com/sindresorhus/screenfull.js
+    document.fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.documentElement.webkitRequestFullScreen;
+
+    function requestFullscreen() {
+        var element = document.body
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullScreen) {
+            element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        }
+    }
+
     function startup () {
+      requestFullscreen()
       startupSound.play()
+      socket = io()
+
       window.removeEventListener('mouseup', startup)
       window.removeEventListener('touchend', startup)
+      // window.removeEventListener('click', requestFullscreen)
 
       window.addEventListener('touchstart', touchStart)
       window.addEventListener('mousedown', touchStart)
       window.addEventListener('touchmove', touchMove)
       window.addEventListener('touchend', touchEnd)
       window.addEventListener('mouseup', touchEnd)
+
+      // to dodge the double-triggering some browsers experience
+      var onFocusTimeout = null
+      window.onfocus = function () {
+        console.log('Tab became focused')
+        clearTimeout(onFocusTimeout)
+        onFocusTimeout = setTimeout(function () {
+          if (socket.disconnected) socket = io()
+          requestFullscreen()
+        }, 0)
+      }
+
+      window.onblur = window.onbeforeunload = function() {
+        console.log('Tab closed/unfocused -> Closing connection...')
+        socket.io.disconnect()
+        console.log(socket)
+      }
     }
 
     // iOS doesn't play sounds until the first touchend event
     window.addEventListener('mouseup', startup)
     window.addEventListener('touchend', startup)
-
-    var socket = io()
 
     var dirPad = document.getElementById('dir-pad')
     var joystickBg = document.getElementById('joystick-bg')
