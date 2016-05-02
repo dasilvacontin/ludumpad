@@ -6,56 +6,7 @@
   <title>LudumPad</title>
   <meta name="description" content="Use mobile devices as smart game controllers.">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-
-      position: relative;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      opacity: 0;
-      background: black;
-      transition: opacity 0.5s;
-    }
-
-    #joystick-bg {
-      position: absolute;
-      left: 76px;
-      top: 97px;
-
-      transition: opacity 0.25s;
-      opacity: 0;
-    }
-
-    #dir-pad {
-      position: absolute;
-      left: 76px;
-      top: 122.5px;
-      transform-origin: right center;
-      opacity: 0;
-    }
-
-    #b-pressed {
-      position: absolute;
-      top: 207px;
-      left: 397px;
-      opacity: 0;
-    }
-
-    #cover {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="style.css" />
   <script src="http://192.168.0.108:3000/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
 </head>

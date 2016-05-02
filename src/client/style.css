@@ -1,0 +1,48 @@
+  html, body {
+    margin: 0;
+    padding: 0;
+
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    opacity: 0;
+    background: black;
+    transition: opacity 0.5s;
+  }
+
+  #joystick-bg {
+    position: absolute;
+    left: 76px;
+    top: 97px;
+
+    transition: opacity 0.25s;
+    opacity: 0;
+  }
+
+  #dir-pad {
+    position: absolute;
+    left: 76px;
+    top: 122.5px;
+    transform-origin: right center;
+    opacity: 0;
+  }
+
+  #b-pressed {
+    position: absolute;
+    top: 207px;
+    left: 397px;
+    opacity: 0;
+  }
+
+  #cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
