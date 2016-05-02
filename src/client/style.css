@@ -35,6 +35,13 @@
     opacity: 0;
   }
 
+  #a-pressed {
+    position: absolute;
+    top: 67px;
+    left: 497px;
+    opacity: 0;
+  }
+
   #b-pressed {
     position: absolute;
     top: 207px;

@@ -3,6 +3,7 @@ var app = express()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
 var morgan = require('morgan')
+var path = require('path')
 var ip = require('ip')
 
 var qrcode = require('qrcode-terminal')
@@ -11,7 +12,8 @@ var robot = require('robotjs')
 // app.use(function (req, res, next) { console.log(req.url) })
 app.use(morgan('combined'))
 
-app.use(express.static(__dirname + '/public'))
+var publicPath = path.join(__dirname, '/public')
+app.use(express.static(publicPath))
 
 var mappings = [
   [ // player 1
@@ -24,7 +26,10 @@ var mappings = [
       '1': 'up' // up
     },
     {
-      '1': 'x' // button
+      '1': 'x' // A button
+    },
+    {
+      '1': '.' // B button
     }
   ],
   [ // player 2
@@ -37,7 +42,10 @@ var mappings = [
       '1': 'w' // up
     },
     {
-      '1': 'space' // button
+      '1': 'space' // A button
+    },
+    {
+      '1': 'e' // B button
     }
   ]
 ]
