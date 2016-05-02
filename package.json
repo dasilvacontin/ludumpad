@@ -17,7 +17,10 @@
   "dependencies": {
     "bluebird": "^3.3.5",
     "express": "^4.13.4",
+    "ip": "^1.1.2",
     "lodash": "^4.11.1",
+    "morgan": "^1.7.0",
+    "qrcode-terminal": "^0.10.0",
     "robotjs": "^0.4.1",
     "socket.io": "^1.4.5"
   },

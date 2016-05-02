@@ -7,7 +7,7 @@
   <meta name="description" content="Use mobile devices as smart game controllers.">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
   <link rel="stylesheet" type="text/css" href="style.css" />
-  <script src="http://192.168.0.108:3000/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
 </head>
 <body>
@@ -52,7 +52,7 @@
     window.addEventListener('mouseup', startup)
     window.addEventListener('touchend', startup)
 
-    var socket = io('http://192.168.0.108:3000')
+    var socket = io()
 
     var dirPad = document.getElementById('dir-pad')
     var joystickBg = document.getElementById('joystick-bg')

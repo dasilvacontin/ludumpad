@@ -1,7 +1,17 @@
-var app = require('express')()
+var express = require('express')
+var app = express()
 var http = require('http').Server(app)
 var io = require('socket.io')(http)
+var morgan = require('morgan')
+var ip = require('ip')
+
+var qrcode = require('qrcode-terminal')
 var robot = require('robotjs')
+
+// app.use(function (req, res, next) { console.log(req.url) })
+app.use(morgan('combined'))
+
+app.use(express.static(__dirname + '/public'))
 
 var mappings = [
   {
@@ -37,5 +47,8 @@ io.on('connection', function (socket) {
 
 var port = process.env.PORT || 3000
 http.listen(port, function () {
-  console.log('Listening on ' + port)
+  var address = 'http://' + ip.address() + ':' + port
+  console.log('# Listening on ' + address + '\n')
+  qrcode.generate(address)
+  console.log('')
 })
