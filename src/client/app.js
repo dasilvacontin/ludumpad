@@ -23,6 +23,14 @@ window.addEventListener('touchstart', preventer)
 window.addEventListener('touchmove', preventer)
 window.addEventListener('touchend', preventer)
 
+var player = '?'
+var ping = '??'
+var lastPing = null
+var debugLabel = document.getElementById('debug-label')
+function renderDebugLabel () {
+  debugLabel.innerHTML = '[DEBUG] Player #' + player + '; Ping ' + ping + '.'
+}
+
 function startup () {
   if (screenfull.enabled) screenfull.request()
   rootDOM.style.background = '#4363D4'
@@ -31,6 +39,7 @@ function startup () {
   socket = io()
 
   window.removeEventListener('touchend', startup)
+  window.removeEventListener('mouseup', startup)
 
   window.addEventListener('touchstart', touchStart)
   window.addEventListener('touchmove', touchMove)
@@ -49,10 +58,34 @@ function startup () {
   window.onblur = window.onbeforeunload = function () {
     socket.io.disconnect()
   }
+
+  socket.on('welcome', function (props) {
+    player = props.player
+    renderDebugLabel()
+  })
+
+  function sendPing () {
+    lastPing = Date.now()
+    socket.emit('ldping')
+  }
+
+  socket.on('ldpong', function () {
+    var pingNow = Date.now() - lastPing
+    ping = typeof ping !== 'number'
+      ? pingNow
+      : Math.floor((ping + pingNow) / 2)
+    renderDebugLabel()
+    setTimeout(sendPing, 1000)
+  })
+
+  socket.on('connect', function () {
+    sendPing()
+  })
 }
 
 // iOS doesn't play sounds until the first touchend event
 window.addEventListener('touchend', startup)
+window.addEventListener('mouseup', startup)
 
 var dirPad = document.getElementById('dir-pad')
 var joystickBg = document.getElementById('joystick-bg')

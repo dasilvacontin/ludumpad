@@ -49,6 +49,16 @@
     opacity: 0;
   }
 
+  #debug-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font: 10px monospace;
+    margin: 5px;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
   #cover {
     position: absolute;
     top: 0;

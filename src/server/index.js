@@ -60,6 +60,14 @@ io.on('connection', function (socket) {
   var mapping = mappings[player]
   console.log(socket.id + ' connected as player #' + (player + 1))
 
+  socket.emit('welcome', {
+    player: (player + 1)
+  })
+
+  socket.on('ldping', function () {
+    socket.emit('ldpong')
+  })
+
   var oldData = [null, null]
   socket.on('update', function (data) {
     data = data.split(',')
