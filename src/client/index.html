@@ -10,6 +10,7 @@
   <link rel="stylesheet" type="text/css" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/3.0.0/screenfull.min.js"></script>
 </head>
 <body>
   <img id="mock bg" src="assets/images/iPhone-6-idle@2x.png" width="667" height="375">
@@ -39,28 +40,13 @@
 
     var socket = null
 
-    // https://github.com/sindresorhus/screenfull.js
-    document.fullscreenEnabled = document.fullscreenEnabled || document.mozFullScreenEnabled || document.documentElement.webkitRequestFullScreen;
-
-    function requestFullscreen() {
-        var element = document.body
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-            element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullScreen) {
-            element.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-        }
-    }
-
     function startup () {
-      requestFullscreen()
+      if (screenfull.enabled) screenfull.request()
       startupSound.play()
       socket = io()
 
       window.removeEventListener('mouseup', startup)
       window.removeEventListener('touchend', startup)
-      // window.removeEventListener('click', requestFullscreen)
 
       window.addEventListener('touchstart', touchStart)
       window.addEventListener('mousedown', touchStart)
@@ -75,7 +61,7 @@
         clearTimeout(onFocusTimeout)
         onFocusTimeout = setTimeout(function () {
           if (socket.disconnected) socket = io()
-          requestFullscreen()
+          if (screenfull.enabled) screenfull.request()
         }, 0)
       }
 
