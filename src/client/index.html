@@ -7,6 +7,8 @@
   <meta name="description" content="Use mobile devices as smart game controllers.">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="stylesheet" type="text/css" href="style.css" />
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.29/howler.js"></script>
@@ -39,9 +41,19 @@
     })
 
     var socket = null
+    var rootDOM = document.getElementsByTagName('html')[0]
+
+    function preventer (e) {
+      e.preventDefault()
+    }
+
+    window.addEventListener('touchstart', preventer)
+    window.addEventListener('touchmove', preventer)
+    window.addEventListener('touchend', preventer)
 
     function startup () {
       if (screenfull.enabled) screenfull.request()
+      rootDOM.style.background = '#4363D4'
       startupSound.play()
       socket = io()
 
@@ -215,20 +227,17 @@
     }
 
     function touchStart (e) {
-      e.preventDefault()
       handleJoystickStart(e)
       handleButtonStart(e)
       sendData()
     }
 
     function touchMove (e) {
-      e.preventDefault()
       handleJoystickMove(e)
       sendData()
     }
 
     function touchEnd (e) {
-      e.preventDefault()
       handleJoystickEnd(e)
       handleButtonEnd(e)
       sendData()
