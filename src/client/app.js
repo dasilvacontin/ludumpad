@@ -23,12 +23,13 @@ window.addEventListener('touchstart', preventer)
 window.addEventListener('touchmove', preventer)
 window.addEventListener('touchend', preventer)
 
-var player = '?'
+var player = null
 var ping = '??'
 var lastPing = null
 var debugLabel = document.getElementById('debug-label')
 function renderDebugLabel () {
-  debugLabel.innerHTML = '[DEBUG] Player #' + player + '; Ping ' + ping + '.'
+  const playerNum = player == null ? '?' : (player + 1)
+  debugLabel.innerHTML = `[DEBUG] Player #${playerNum}; Ping ${ping}.`
 }
 
 function startup () {
@@ -59,21 +60,22 @@ function startup () {
     socket.io.disconnect()
   }
 
-  socket.on('welcome', function (props) {
-    player = props.player
+  socket.on('ld:welcome', function (props) {
+    player = props.number
     renderDebugLabel()
   })
 
   function sendPing () {
     lastPing = Date.now()
-    socket.emit('ldping')
+    socket.emit('ld:ping')
   }
 
-  socket.on('ldpong', function () {
+  socket.on('ld:pong', function () {
     var pingNow = Date.now() - lastPing
     ping = typeof ping !== 'number'
       ? pingNow
       : Math.floor((ping + pingNow) / 2)
+    socket.emit('ld:pung')
     renderDebugLabel()
     setTimeout(sendPing, 1000)
   })
@@ -300,5 +302,5 @@ function sendData () {
   var currentData = joystickData.concat(buttonData).join(',')
   if (oldData === currentData) return
   oldData = currentData
-  socket.emit('update', currentData)
+  socket.emit('ld:input-update', currentData)
 }

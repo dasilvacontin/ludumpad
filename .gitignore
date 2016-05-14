@@ -1,7 +1,8 @@
 # Build
 /bin
 /lib
-/server
+/ludumpad-server
+/ludumpad-mapper
 /client
 
 # Node
