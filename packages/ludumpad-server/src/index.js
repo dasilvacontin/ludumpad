@@ -14,6 +14,7 @@ LDController.injectInto(Socket)
 export default class LDServer extends IOServer {
   name: string
   version: string
+  address: string
   controllers : Array<?Socket>
 
   constructor (config = {}) {
@@ -33,10 +34,10 @@ export default class LDServer extends IOServer {
     console.log(figlet.textSync(this.name))
     console.log(`v${this.version}\n`)
     const port = config.port || 3000
+    this.address = `http://${ip.address()}:${port}`
     http.listen(port, () => {
-      const address = `http://${ip.address()}:${port}`
-      console.log(`LudumPad Server listening on ${address}\n`)
-      qrcode.generate(address)
+      console.log(`LudumPad Server listening on ${this.address}\n`)
+      qrcode.generate(this.address)
       console.log('')
     })
   }
