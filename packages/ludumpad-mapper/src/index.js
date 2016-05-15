@@ -1,8 +1,11 @@
-import LDServer from '../ludumpad-server'
-import { components } from '../ludumpad-server/ld-controller.js'
+import LDServer from 'ludumpad-server'
+import { components } from 'ludumpad-server/lib/ld-controller.js'
 import robot from 'robotjs'
 
-const app = new LDServer({ name: 'LudumPad Mapper' })
+const app = new LDServer({
+  name: 'LudumPad Mapper',
+  version: require('../package.json').version
+})
 
 var mappings = [
   { // player 1

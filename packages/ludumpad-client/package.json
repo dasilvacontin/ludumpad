@@ -1,13 +1,14 @@
 {
-  "name": "ludumpad",
+  "name": "ludumpad-client",
   "version": "0.0.0",
-  "description": "Your smartphone is your controller.",
+  "description": "LudumPad controller implementation.",
   "keywords": [
     "ludumpad",
+    "client",
     "controller",
     "socket.io"
   ],
-  "homepage": "https://github.com/dasilvacontin/ludumpad",
+  "homepage": "https://github.com/dasilvacontin/ludumpad/tree/master/packages/ludumpad-client",
   "bugs": "https://github.com/dasilvacontin/ludumpad/issues",
   "license": "LGPL-3.0",
   "author": {
@@ -15,7 +16,10 @@
     "email": "dasilvacontin@gmail.com",
     "url": "http://dasilvacont.in"
   },
-  "files": [],
+  "files": [
+    "lib"
+  ],
+  "main": "lib/app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dasilvacontin/ludumpad.git"
@@ -26,7 +30,13 @@
     "pretest": "npm run lint && npm run typecheck",
     "test": "mocha --compilers js:babel-register",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-register",
-    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls"
+    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "build": "rsync -av --exclude=*.js src/ lib/ && babel src --out-dir lib && browserify lib/app.js -o lib/bundle.js",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "howler": "^1.1.29",
+    "screenfull": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",
@@ -40,7 +50,7 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.7.2",
     "babel-runtime": "^6.6.1",
-    "browserify": "^13.0.0",
+    "browserify": "^13.0.1",
     "coveralls": "^2.11.9",
     "dot-only-hunter": "^1.0.2",
     "eslint": "^2.9.0",

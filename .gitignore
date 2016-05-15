@@ -1,9 +1,5 @@
 # Build
-/bin
-/lib
-/ludumpad-server
-/ludumpad-mapper
-/client
+/packages/*/lib
 
 # Node
 node_modules

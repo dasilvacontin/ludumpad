@@ -1,6 +1,13 @@
 import { EventEmitter } from 'events'
 const emit = EventEmitter.prototype.emit
 
+type Input = {
+  xaxis: number,
+  yaxis: number,
+  a: number,
+  b: number
+}
+
 const components = [
   'xaxis',
   'yaxis',
@@ -9,6 +16,9 @@ const components = [
 ]
 
 export default class LDController {
+  number: number
+  oldInput: Input
+
   init (number) {
     this.number = number
     this.oldInput = this.input = {}
@@ -32,7 +42,7 @@ export default class LDController {
 
     data.split(',').forEach((val, i) => {
       const component = components[i]
-      this.input[component] = val
+      this.input[component] = Number(val)
     })
 
     emit.call(this, 'input-update', this.input, this.oldInput)

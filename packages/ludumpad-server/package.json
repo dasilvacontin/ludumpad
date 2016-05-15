@@ -1,13 +1,14 @@
 {
-  "name": "ludumpad",
+  "name": "ludumpad-server",
   "version": "0.0.0",
-  "description": "Your smartphone is your controller.",
+  "description": "Spawn LudumPad servers and communicate with controllers.",
   "keywords": [
     "ludumpad",
+    "server",
     "controller",
     "socket.io"
   ],
-  "homepage": "https://github.com/dasilvacontin/ludumpad",
+  "homepage": "https://github.com/dasilvacontin/ludumpad/tree/master/packages/ludumpad-server",
   "bugs": "https://github.com/dasilvacontin/ludumpad/issues",
   "license": "LGPL-3.0",
   "author": {
@@ -15,7 +16,10 @@
     "email": "dasilvacontin@gmail.com",
     "url": "http://dasilvacont.in"
   },
-  "files": [],
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dasilvacontin/ludumpad.git"
@@ -26,7 +30,17 @@
     "pretest": "npm run lint && npm run typecheck",
     "test": "mocha --compilers js:babel-register",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-register",
-    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls"
+    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "build": "rsync -av --exclude=*.js src/ lib/ && babel src --out-dir lib",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "figlet": "^1.1.2",
+    "ip": "^1.1.3",
+    "ludumpad-client": "0.0.0",
+    "qrcode-terminal": "^0.10.0",
+    "socket.io": "^1.4.6"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",

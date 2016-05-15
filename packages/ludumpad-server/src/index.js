@@ -3,6 +3,7 @@ import express from 'express'
 import { Server } from 'http'
 import IOServer from 'socket.io'
 import ip from 'ip'
+import figlet from 'figlet'
 import qrcode from 'qrcode-terminal'
 
 // hacks
@@ -10,31 +11,29 @@ import LDController from './ld-controller.js'
 import Socket from 'socket.io/lib/socket.js'
 LDController.injectInto(Socket)
 
-function renderTitle () {
-  const b64title = 'IF8gICAgICAgICAgICAgIF8gICAgICAgICAgICAgICAgIF9fX18gICAgICAgICAgIF8gDQp8IHwgICBfICAgXyAgX198IHxfICAgXyBfIF9fIF9fXyB8ICBfIFwgX18gXyAgX198IHwNCnwgfCAgfCB8IHwgfC8gX2AgfCB8IHwgfCAnXyBgIF8gXHwgfF8pIC8gX2AgfC8gX2AgfA0KfCB8X198IHxffCB8IChffCB8IHxffCB8IHwgfCB8IHwgfCAgX18vIChffCB8IChffCB8DQp8X19fX19cX18sX3xcX18sX3xcX18sX3xffCB8X3wgfF98X3wgICBcX18sX3xcX18sX3wNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KIF9fICBfXyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQp8ICBcLyAgfCBfXyBfIF8gX18gIF8gX18gICBfX18gXyBfXyANCnwgfFwvfCB8LyBfYCB8ICdfIFx8ICdfIFwgLyBfIFwgJ19ffA0KfCB8ICB8IHwgKF98IHwgfF8pIHwgfF8pIHwgIF9fLyB8ICAgDQp8X3wgIHxffFxfXyxffCAuX18vfCAuX18vIFxfX198X3wgICANCiAgICAgICAgICAgICB8X3wgICB8X3wgICAgICAgICAgICAgIA=='
-  let title = Buffer.from
-    ? Buffer.from(b64title, 'base64')
-    : new Buffer(b64title, 'base64')
-  console.log(title.toString())
-}
-
 export default class LDServer extends IOServer {
+  name: string
+  version: string
+  controllers : Array<?Socket>
+
   constructor (config = {}) {
     const app = express()
-    var publicPath = path.join(__dirname, '/public')
+    var publicPath = path.join(__dirname, '/../node_modules/ludumpad-client/lib/')
     app.use(express.static(publicPath))
 
     const http = Server(app)
     super(http)
 
+    this.name = config.name || 'LudumPad Server'
+    this.version = config.version || '?.?.?'
     this.controllers = []
 
     this.on('connection', this.onConnection.bind(this))
 
+    console.log(figlet.textSync(this.name))
+    console.log(`v${this.version}\n`)
     const port = config.port || 3000
-    http.listen(port, function () {
-      renderTitle()
-      console.log('')
+    http.listen(port, () => {
       const address = `http://${ip.address()}:${port}`
       console.log(`LudumPad Server listening on ${address}\n`)
       qrcode.generate(address)

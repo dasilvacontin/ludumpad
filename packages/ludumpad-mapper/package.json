@@ -1,13 +1,16 @@
 {
-  "name": "ludumpad",
+  "name": "ludumpad-mapper",
   "version": "0.0.0",
-  "description": "Your smartphone is your controller.",
+  "description": "Map keys to LudumPad input.",
   "keywords": [
     "ludumpad",
+    "server",
     "controller",
-    "socket.io"
+    "socket.io",
+    "map",
+    "keys"
   ],
-  "homepage": "https://github.com/dasilvacontin/ludumpad",
+  "homepage": "https://github.com/dasilvacontin/ludumpad/tree/master/packages/ludumpad-mapper",
   "bugs": "https://github.com/dasilvacontin/ludumpad/issues",
   "license": "LGPL-3.0",
   "author": {
@@ -15,7 +18,14 @@
     "email": "dasilvacontin@gmail.com",
     "url": "http://dasilvacont.in"
   },
-  "files": [],
+  "files": [
+    "lib",
+    "bin"
+  ],
+  "main": "lib/index.js",
+  "bin": {
+    "ludumpad-mapper": "bin/ludumpad-mapper.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dasilvacontin/ludumpad.git"
@@ -26,7 +36,14 @@
     "pretest": "npm run lint && npm run typecheck",
     "test": "mocha --compilers js:babel-register",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-register",
-    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls"
+    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "build": "rsync -av --exclude=*.js src/ lib/ && babel src --out-dir lib",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "ludumpad-server": "0.0.0",
+    "minimist": "^1.2.0",
+    "robotjs": "0.4.2"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",
