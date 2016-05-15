@@ -1,4 +1,4 @@
-![fake stock img](stock.jpg)
+![Playing BOXEHAD using LudumPad](boxhead.gif)
 
 # LudumPad
 
