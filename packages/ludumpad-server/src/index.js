@@ -18,7 +18,7 @@ export default class LDServer extends IOServer {
 
   constructor (config = {}) {
     const app = express()
-    var publicPath = path.join(__dirname, '/../node_modules/ludumpad-client/lib/')
+    var publicPath = path.dirname(require.resolve('ludumpad-client'))
     app.use(express.static(publicPath))
 
     const http = Server(app)

@@ -1,6 +1,6 @@
 {
   "name": "ludumpad-mapper",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Map keys to LudumPad input.",
   "keywords": [
     "ludumpad",
@@ -41,7 +41,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "ludumpad-server": "0.0.0",
+    "ludumpad-server": "~0.0.1",
     "minimist": "^1.2.0",
     "robotjs": "0.4.2"
   },
