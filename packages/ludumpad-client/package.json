@@ -35,6 +35,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "babel-runtime": "^6.6.1",
     "howler": "^1.1.29",
     "screenfull": "^3.0.0"
   },

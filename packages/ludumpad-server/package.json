@@ -35,6 +35,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
+    "babel-runtime": "^6.6.1",
     "express": "^4.13.4",
     "figlet": "^1.1.2",
     "ip": "^1.1.3",
