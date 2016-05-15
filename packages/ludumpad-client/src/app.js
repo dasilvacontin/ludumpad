@@ -269,7 +269,7 @@ function handleButtonEnd (e) {
 
   for (var buttonId = 0; buttonId < buttons.length; ++buttonId) {
     var touchId = buttonTouchId[buttonId]
-    if (!touchId) continue
+    if (touchId == null) continue
     if (endedTouches[touchId]) {
       buttonTouchId[buttonId] = null
       buttonData[buttonId] = 0
