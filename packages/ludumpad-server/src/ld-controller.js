@@ -34,6 +34,9 @@ export default class LDController {
     })
 
     this.on('ld:input-update', this.onInputUpdate.bind(this))
+    this.on('ld:debug', msg => {
+      console.log(`> debug message from ${this.id} (player #${this.number + 1}): ${msg}`)
+    })
   }
 
   onInputUpdate (data) {

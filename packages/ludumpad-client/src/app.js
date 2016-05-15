@@ -304,3 +304,17 @@ function sendData () {
   oldData = currentData
   socket.emit('ld:input-update', currentData)
 }
+
+function log (msg) {
+  if (typeof msg !== 'string') msg = JSON.stringify(msg)
+  if (socket) socket.emit('ld:debug', msg)
+  console.log(msg)
+}
+
+window.onerror = function (msg, url, line, col, error) {
+  let extra = ''
+  if (col) extra += '\ncolumn: ' + col
+  if (error) extra += '\nerror: ' + error
+  const errStr = `Error: ${msg}\nurl: ${url}\nline: ${line}${extra}`
+  log(errStr)
+}
