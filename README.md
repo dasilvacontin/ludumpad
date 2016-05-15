@@ -17,7 +17,7 @@ All related packages are hosted under this same repo – it's a monorepo. For no
 
 ## License
 
-MIT © [David da Silva]
+LGPL-3.0 © [David da Silva]
 
 [ludumpad-client]:https://github.com/dasilvacontin/ludumpad/tree/master/packages/ludumpad-client
 [ludumpad-server]:https://github.com/dasilvacontin/ludumpad/tree/master/packages/ludumpad-server
