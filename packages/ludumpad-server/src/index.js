@@ -11,6 +11,8 @@ import LDController from './ld-controller.js'
 import Socket from 'socket.io/lib/socket.js'
 LDController.injectInto(Socket)
 
+const ldServerVersion = require('../package.json').version
+
 export default class LDServer extends IOServer {
   name: string
   version: string
@@ -31,15 +33,9 @@ export default class LDServer extends IOServer {
 
     this.on('connection', this.onConnection.bind(this))
 
-    console.log(figlet.textSync(this.name))
-    console.log(`v${this.version}\n`)
     const port = config.port || 3000
     this.address = `http://${ip.address()}:${port}`
-    http.listen(port, () => {
-      console.log(`LudumPad Server listening on ${this.address}\n`)
-      qrcode.generate(this.address)
-      console.log('')
-    })
+    http.listen(port)
   }
 
   onConnection (controller) {
@@ -58,5 +54,13 @@ export default class LDServer extends IOServer {
     let freeSlot = this.controllers.indexOf(null)
     if (freeSlot === -1) freeSlot = this.controllers.length
     return freeSlot
+  }
+
+  logWelcome () {
+    console.log(figlet.textSync(this.name))
+    console.log(`v${this.version}\n`)
+    console.log(`LudumPad Server v${ldServerVersion} listening on ${this.address}\n`)
+    qrcode.generate(this.address)
+    console.log('')
   }
 }
