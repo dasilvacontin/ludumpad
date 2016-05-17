@@ -2,11 +2,6 @@ import LDServer from 'ludumpad-server'
 import { components } from 'ludumpad-server/lib/ld-controller.js'
 import robot from 'robotjs'
 
-const app = new LDServer({
-  name: 'LudumPad Mapper',
-  version: require('../package.json').version
-})
-
 var mappings = [
   { // player 1
     xaxis: { '-1': 'left', '1': 'right' },
@@ -27,29 +22,44 @@ function mappingIsValid (mapping) {
   return isComplete
 }
 
-app.on('connection', function (controller) {
-  let mapping = mappings[controller.number]
-  if (!mapping) {
-    app.log(`controller ${controller.number} connected, but no mapping is available`)
-    return
-  }
+export default function ldMapper (config) {
+  const app = new LDServer(config)
 
-  controller.on('mapping-update', function (newMapping) {
-    if (mappingIsValid(newMapping)) mapping = newMapping
-    else controller.emit('mapping-update-failure')
-  })
-
-  controller.on('input-update', function (input, oldInput) {
-    for (var component in input) {
-      const newVal = input[component]
-      const oldVal = oldInput[component]
-      if (newVal === oldVal) continue
-
-      const oldKey = mapping[component][oldVal]
-      if (oldKey) robot.keyToggle(oldKey, 'up')
-
-      const newKey = mapping[component][newVal]
-      if (newKey) robot.keyToggle(newKey, 'down')
+  app.on('connection', function (controller) {
+    controller.mapping = mappings[controller.number]
+    if (!controller.mapping) {
+      app.log(`controller ${controller.number} connected, but no mapping is available`)
+      return
     }
+
+    controller.on('mapping-update', function (newMapping) {
+      if (mappingIsValid(newMapping)) controller.mapping = newMapping
+      else controller.emit('mapping-update-failure')
+    })
+
+    controller.on('input-update', function (input, oldInput) {
+      for (var component in input) {
+        const newVal = input[component]
+        const oldVal = oldInput[component]
+        if (newVal === oldVal) continue
+
+        const oldKey = controller.mapping[component][oldVal]
+        if (oldKey) robot.keyToggle(oldKey, 'up')
+
+        const newKey = controller.mapping[component][newVal]
+        if (newKey) robot.keyToggle(newKey, 'down')
+      }
+    })
   })
-})
+
+  return app
+}
+
+if (require.main === module) {
+  console.log('yo mama!')
+  const app = ldMapper({
+    name: 'LudumPad Mapper',
+    version: require('../package.json').version
+  })
+  app.logWelcome()
+}
