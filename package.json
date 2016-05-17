@@ -26,7 +26,8 @@
     "pretest": "npm run lint && npm run typecheck",
     "test": "mocha --compilers js:babel-register",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-register",
-    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls"
+    "ci": "dot-only-hunter && npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "build": "find packages -maxdepth 1 -type d \\( ! -name packages \\) -exec bash -c \"cd '{}' && npm run build\" \\;"
   },
   "devDependencies": {
     "babel-cli": "^6.7.5",
