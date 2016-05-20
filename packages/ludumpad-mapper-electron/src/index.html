@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <title>LudumPad Mapper</title>
+  <style>
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      background: #EEEEEE;
+    }
+
+    body {
+      margin: 50px;
+    }
+
+    * {
+      font-size: 18px;
+    }
+
+  </style>
+</head>
+<body>
+  <h1 id="title-label"># LudumPad Mapper</h1>
+  <p id="address-label">Address: ???</p>
+  <p id="controllers"></p>
+  <script>
+    const ldMapper = require('ludumpad-mapper').default
+    const beautify = require("json-beautify")
+
+    debugger
+    const server = ldMapper({
+      name: 'LudumPad Mapper Electron',
+      version: require('../package.json').version
+    })
+
+    const titleLabel = document.getElementById('title-label')
+    titleLabel.innerHTML = `# LudumPad Mapper v${server.version}`
+
+    const addressLabel = document.getElementById('address-label')
+    addressLabel.innerHTML = `Address: ${server.address}`
+
+    const controllersDOM = document.getElementById('controllers')
+    function renderControllerInput () {
+      requestAnimationFrame(renderControllerInput)
+      var inputs = server.controllers
+        .filter(controller => controller)
+        .map(controller => controller.input)
+      const view = beautify(inputs, null, 2, 40)
+      controllersDOM.innerHTML = view.replace(/(?:\r\n|\r|\n)/g, '<br>').replace(/\s/g, '&nbsp;')
+    }
+    requestAnimationFrame(renderControllerInput)
+  </script>
+</body>
