@@ -28,12 +28,13 @@
   <script>
     const ldMapper = require('ludumpad-mapper').default
     const beautify = require("json-beautify")
+    const ipcRenderer = require('electron').ipcRenderer
 
-    debugger
     const server = ldMapper({
       name: 'LudumPad Mapper Electron',
       version: require('../package.json').version
     })
+    ipcRenderer.send('ludumpad-server:start', server.address)
 
     const titleLabel = document.getElementById('title-label')
     titleLabel.innerHTML = `# LudumPad Mapper v${server.version}`

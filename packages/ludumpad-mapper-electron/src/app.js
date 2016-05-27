@@ -1,11 +1,16 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, ipcMain } from 'electron'
 
-/* waiting for electron/electron/issues/5566
-app.setUserActivity({
-  activityType: 'in.dasilvacont.ludumpad.gamepad',
-  'webpageURL': server.address
+let serverAddress = null
+function setUserActivity () {
+  if (!serverAddress) return
+  console.log(`handoff with webpageURL ${serverAddress}`)
+  app.setUserActivity('in.dasilvacont.ludumpad.gamepad', {}, serverAddress)
+}
+
+ipcMain.on('ludumpad-server:start', (_, address) => {
+  serverAddress = address
+  setUserActivity()
 })
-*/
 
 app.on('ready', function () {
   const win = new BrowserWindow({
@@ -14,6 +19,11 @@ app.on('ready', function () {
     frame: false
   })
   win.loadURL(`file://${__dirname}/index.html`)
+})
+
+app.on('browser-window-focus', () => {
+  console.log('window focused')
+  setUserActivity()
 })
 
 app.on('window-all-closed', () => app.quit())
